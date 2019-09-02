@@ -1,0 +1,85 @@
+<html lang="es">
+<head>
+    <title>Simulación Transacciones Bancarias</title>
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+<div>
+    <form action="/servlet" method="post">
+        <input type="submit" class="btn btn-primary">Iniciar</button>
+    </form>
+</div>
+<div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Cantidad clientes</th>
+            <th>Cantidad Consiganciones</th>
+            <th>Cantidad Retiros</th>
+            <th>Cantidad Pago Servicios</th>
+            <th>Cantidad Apertura de cuenta</th>
+            <th>Cantidad de clientes no atendidos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>$clientAmount</td>
+            <td>$totalDeposits</td>
+            <td>$totalWithdrawal</td>
+            <td>$totalServicePayment</td>
+            <td>$totalAccountOpening</td>
+            <td>$totalClientsNotServed</td>
+        </tr>
+        <tr>
+            <th colspan="6">Registro transacciones</th>
+        </tr>
+        <tr>
+            <td colspan="6">
+                #foreach($transaction in $transactions)
+                    <table class="table table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Cantidad Clientes</th>
+                            <th>Rango de tiempo</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>$foreach.index</td>
+                            <td>$transaction.clientAmount</td>
+                            <td>$transaction.timeSpan</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <table class="table table-hover table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Transación</th>
+                                        <th>Duración</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        #foreach($clientTransaction in $transaction.clientTransactions)
+                                        <tr>
+                                            <td>$clientTransaction.clientId</td>
+                                            <td>$clientTransaction.transactionType.value</td>
+                                            <td>$clientTransaction.transactionTimeSpan</td>
+                                        </tr>
+                                        #end
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                #end
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script></script>
+</body>
+</html>
