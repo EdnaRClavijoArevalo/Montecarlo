@@ -1,22 +1,15 @@
 package com.universitaria.edna.proyecto_simulacion;
 
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Proyecto_simulacion {
 
     private String[] dayHourPrefix = {"8:", "9:", "10:", "11:", "12:", "13:", "14:", "15:", "16:", "17:"};
     private int[] clientId = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    private int TotalDeposits = 0;
-    private int TotalWithdrawal = 0;
-    private int TotalServicePayment = 0;
-    private int TotalAccountOpening = 0;
-    private int ClientAmount = 0;
-    private int NotServed = 0;
-    private int TotalClientsNotServed = 0;
     private double timeSpan = 10;
     private double timeRange = 9;
     private CashierIndex lastActiveCashier = null;
@@ -73,8 +66,6 @@ public class Proyecto_simulacion {
             int randomPasses = 1;
             MontecarloClientAmountGenerator clientNumberGenerator = new MontecarloClientAmountGenerator(randomPasses); //instancia el metodo desde la clase random_montecarlo
             int clientAmount = clientNumberGenerator.clientRoundUp();
-            ClientAmount = ClientAmount + (clientAmount + 1);
-            TotalClientsNotServed = ClientAmount - NotServed;
             int hourIndex = minute / 6;
             int minutesOffset = minute % 6;
             if (minutesOffset == 0) {
@@ -105,13 +96,12 @@ public class Proyecto_simulacion {
                 if (nextCashier != null) {
                     clientTransaction.setServedBy(nextCashier.getNum());
                     clientTransaction.setTransactionType(transactionData());
+                    clientTransaction.setTransactionTimeSpan(requiredTime);
                 } else {
                     clientTransaction.setTransactionType(TransactionType.NO_ATENDIDA);
                 }
                 clientTransaction.setClientId(transactionClientIdx);
-                clientTransaction.setTransactionTimeSpan(requiredTime);
                 clientTransactions.add(clientTransaction);
-                NotServed = TotalDeposits + TotalWithdrawal + TotalServicePayment + TotalAccountOpening;
             }
             generatedTransaction.setClientTransactions(clientTransactions);
             generatedTransactions.add(generatedTransaction);
@@ -119,56 +109,61 @@ public class Proyecto_simulacion {
         return generatedTransactions;
     }
 
+    public SimulationResults getResults(List<GeneratedTransaction> generatedTransactions) {
+        SimulationResults simulationResults = new SimulationResults();
+        for (GeneratedTransaction generatedTransaction : generatedTransactions) {
+            simulationResults.addClientAmount(generatedTransaction.getClientAmount());
+            for (ClientTransaction clientTransaction : generatedTransaction.getClientTransactions()) {
+                if (clientTransaction.getServedBy() != null) {
+                    simulationResults
+                            .getCashierStats()
+                            .get(clientTransaction.getServedBy())
+                            .addServedCustomers(1);
+                    simulationResults
+                            .getCashierStats()
+                            .get(clientTransaction.getServedBy())
+                            .addServedTime(clientTransaction.getTransactionTimeSpan());
+
+                    generatedTransaction
+                            .getCashierStats()
+                            .get(clientTransaction.getServedBy())
+                            .addServedCustomers(1);
+                    generatedTransaction
+                            .getCashierStats()
+                            .get(clientTransaction.getServedBy())
+                            .addServedTime(clientTransaction.getTransactionTimeSpan());
+                }
+                switch (clientTransaction.getTransactionType()) {
+                    case APERTURA_CUENTA:
+                        simulationResults.addTotalAccountOpening();
+                        break;
+                    case CONSIGNACION:
+                        simulationResults.addTotalDeposits();
+                        break;
+                    case PAGO_SERVICIOS:
+                        simulationResults.addTotalServicePayment();
+                        break;
+                    case RETIRO:
+                        simulationResults.addTotalWithdrawal();
+                        break;
+                    case NO_ATENDIDA:
+                        simulationResults.addTotalClientsNotServed();
+                        break;
+                }
+            }
+        }
+        return simulationResults;
+    }
+
     private TransactionType transactionData() {
         int randomPasses = 1;
         MontecarloTransactionTypeGenerator transactionGenerator = new MontecarloTransactionTypeGenerator(randomPasses); //instancia el metodo desde la clase random_montecarlo
-        TransactionType transactionType = transactionGenerator.getTransactionType();
-        switch (transactionType) {
-            case CONSIGNACION:
-                TotalDeposits++;
-                break;
-            case RETIRO:
-                TotalWithdrawal++;
-                break;
-            case PAGO_SERVICIOS:
-                TotalServicePayment++;
-                break;
-            case APERTURA_CUENTA:
-                TotalAccountOpening++;
-                break;
-            default:
-                throw new NotImplementedException();
-        }
-        return transactionType;
+        return transactionGenerator.getTransactionType();
     }
 
     private double transactionTimeSpan() {
         int randomPasses = 1;
         MontecarloTransactionTimeGenerator generatedTimeSpan = new MontecarloTransactionTimeGenerator(randomPasses); //instancia el metodo desde la clase random_montecarlo
         return generatedTimeSpan.getTransactionTime();
-    }
-
-    public int getTotalDeposits() {
-        return TotalDeposits;
-    }
-
-    public int getTotalWithdrawal() {
-        return TotalWithdrawal;
-    }
-
-    public int getTotalServicePayment() {
-        return TotalServicePayment;
-    }
-
-    public int getTotalAccountOpening() {
-        return TotalAccountOpening;
-    }
-
-    public int getTotalClientsNotServed() {
-        return TotalClientsNotServed;
-    }
-
-    public int getClientAmount() {
-        return ClientAmount;
     }
 }

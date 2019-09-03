@@ -7,7 +7,7 @@ public class Cashier {
     private CashierIndex num;
 
     public boolean hasTimeToProcess(double requiredTime) {
-        return usedTime + requiredTime < timeAvailable;
+        return usedTime + requiredTime <= timeAvailable;
     }
 
     public void processTransaction(double processingTime) {

@@ -32,6 +32,38 @@
             <td>$totalClientsNotServed</td>
         </tr>
         <tr>
+            <td colspan="6">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Cajero</th>
+                        <th>Clientes Atendidos</th>
+                        <th>Tiempo de servicio</th>
+                        <th>Promedio por cliente</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach($cashier in $cashierStats)
+                        <tr>
+                            <td>
+                                $cashier.name.value
+                            </td>
+                            <td>
+                                $cashier.servedCustomers
+                            </td>
+                            <td>
+                                $cashier.servedTime
+                            </td>
+                            <td>
+                                $cashier.timeAvg
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
             <th colspan="6">Registro transacciones</th>
         </tr>
         <tr>
@@ -50,6 +82,38 @@
                             <td>$foreach.index</td>
                             <td>$transaction.clientAmount</td>
                             <td>$transaction.timeSpan</td>
+                        <tr>
+                            <td colspan="6">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Cajero</th>
+                                        <th>Clientes Atendidos</th>
+                                        <th>Tiempo de servicio</th>
+                                        <th>Promedio por cliente</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        #foreach($cashier in $transaction.cashiers)
+                                        <tr>
+                                            <td>
+                                                $cashier.name.value
+                                            </td>
+                                            <td>
+                                                $cashier.servedCustomers
+                                            </td>
+                                            <td>
+                                                $cashier.servedTime
+                                            </td>
+                                            <td>
+                                                $cashier.timeAvg
+                                            </td>
+                                        </tr>
+                                        #end
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
                         </tr>
                         <tr>
                             <td colspan="3">
@@ -68,7 +132,7 @@
                                             <td>$clientTransaction.clientId</td>
                                             <td>$clientTransaction.transactionType.value</td>
                                             <td>$clientTransaction.transactionTimeSpan</td>
-                                            <td>$clientTransaction.cajeroNum</td>
+                                            <td>$!clientTransaction.servedBy.value</td>
                                         </tr>
                                         #end
                                     </tbody>
