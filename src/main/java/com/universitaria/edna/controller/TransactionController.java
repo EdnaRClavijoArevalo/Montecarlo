@@ -11,6 +11,18 @@ import java.util.List;
 import java.util.Map;
 
 public class TransactionController {
+
+    public ModelAndView servePlainPage(Request request, Response response) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("clientAmount", "0");
+        model.put("totalDeposits", "0");
+        model.put("totalWithdrawal", "0");
+        model.put("totalServicePayment", "0");
+        model.put("totalAccountOpening", "0");
+        model.put("totalClientsNotServed", "0");
+        return new ModelAndView(model, "/views/transactions.vm");
+    }
+
     public ModelAndView serveLoginPage(Request request, Response response) {
         Map<String, Object> model = new HashMap<>();
         Proyecto_simulacion ps = new Proyecto_simulacion();

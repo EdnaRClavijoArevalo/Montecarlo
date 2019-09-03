@@ -4,7 +4,12 @@ public class ClientTransaction {
     private int clientId;
     private TransactionType transactionType;
     private double transactionTimeSpan;
+    private String cajeroNum;
 
+    public String getCajeroNum(){ return  cajeroNum;}
+    public void setCajeroNum(String cajeroNum) {
+        this.cajeroNum = cajeroNum;
+    }
     public int getClientId() {
         return clientId;
     }

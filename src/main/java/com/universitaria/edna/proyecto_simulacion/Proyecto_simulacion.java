@@ -50,11 +50,16 @@ public class Proyecto_simulacion {
             generatedTransaction.setClientAmount(clientId[clientAmount]);
             int clientsByTransaction = clientId[clientAmount];
             List<ClientTransaction> clientTransactions = new ArrayList<>();
+            String Cajero =CajeroNum("");
             for (int transactionClientIdx = 0; transactionClientIdx < clientsByTransaction; transactionClientIdx++) {
+                if (Cajero != ""){
+                    Cajero = CajeroNum(Cajero);
+                }
                 ClientTransaction clientTransaction = new ClientTransaction();
                 clientTransaction.setClientId(transactionClientIdx);
                 clientTransaction.setTransactionType(transactionData());
                 clientTransaction.setTransactionTimeSpan(transactionTimeSpan());
+                clientTransaction.setCajeroNum(Cajero);
                 clientTransactions.add(clientTransaction);
                 NotServed = TotalDeposits + TotalWithdrawal + TotalServicePayment + TotalAccountOpening;
             }
@@ -62,6 +67,16 @@ public class Proyecto_simulacion {
             generatedTransactions.add(generatedTransaction);
         }
         return generatedTransactions;
+    }
+
+    private String CajeroNum( String Cajero ){
+
+        switch (Cajero){
+            case  "Cajero 1":
+                return  "Cajero 2";
+            default:
+                return  "Cajero 1";
+        }
     }
 
     private TransactionType transactionData() {

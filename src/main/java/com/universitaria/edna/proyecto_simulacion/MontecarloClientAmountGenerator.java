@@ -22,6 +22,14 @@ public class MontecarloClientAmountGenerator {
             seed = generatedValue;
         }
     }
+   /* public double RandomDigits(int length)
+    {
+        Random randomGenerator = new Random();
+        String s = String.Empty;
+        for (int i = 0; i < length; i++)
+            s = String.Concat(s, random.Next(1, 10).ToString());
+        return double.Parse(s);
+    }*/
 
     public int clientRoundUp() {
         if (generatedValue <= 0.10 && generatedValue > 0) {

@@ -11,6 +11,7 @@ public class App {
         staticFiles.location("/public");
         staticFiles.expireTime(600L);
         TransactionController transactionController = new TransactionController();
-        get("/", transactionController::serveLoginPage, new VelocityTemplateEngine());
+        get("/", transactionController::servePlainPage, new VelocityTemplateEngine());
+        post("/", transactionController::serveLoginPage, new VelocityTemplateEngine());
     }
 }
