@@ -3,8 +3,8 @@ package com.universitaria.edna.proyecto_simulacion;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Proyecto_simulacion {
 
@@ -17,49 +17,99 @@ public class Proyecto_simulacion {
     private int ClientAmount = 0;
     private int NotServed = 0;
     private int TotalClientsNotServed = 0;
+    private double timeSpan = 10;
+    private double timeRange = 9;
+    private CashierIndex lastActiveCashier = null;
+
+    private Cashier getNextCashier(Map<CashierIndex, Cashier> cashiers, double usedTime) {
+        Cashier cashier1 = cashiers.get(CashierIndex.CAJERO1);
+        if (CashierIndex.CAJERO1 != lastActiveCashier && cashier1.hasTimeToProcess(usedTime)) {
+            lastActiveCashier = CashierIndex.CAJERO1;
+            cashier1.processTransaction(usedTime);
+            return cashier1;
+        }
+        Cashier cashier2 = cashiers.get(CashierIndex.CAJERO2);
+        if (CashierIndex.CAJERO2 != lastActiveCashier && cashier2.hasTimeToProcess(usedTime)) {
+            lastActiveCashier = CashierIndex.CAJERO2;
+            cashier2.processTransaction(usedTime);
+            return cashier2;
+        }
+        if (!cashier1.hasTimeToProcess(usedTime) && cashier2.hasTimeToProcess(usedTime)) {
+            lastActiveCashier = CashierIndex.CAJERO2;
+            cashier2.processTransaction(usedTime);
+            return cashier2;
+        } else if (!cashier2.hasTimeToProcess(usedTime) && cashier1.hasTimeToProcess(usedTime)) {
+            lastActiveCashier = CashierIndex.CAJERO1;
+            cashier1.processTransaction(usedTime);
+            return cashier1;
+        }
+        System.out.println("There are no cashiers available");
+        lastActiveCashier = null;
+        return null;
+    }
+
+    private Map<CashierIndex, Cashier> buildCashiers() {
+        Map<CashierIndex, Cashier> cashiers = new HashMap<>();
+        for (CashierIndex value : CashierIndex.values()) {
+            Cashier cashier = new Cashier();
+            cashier.setBusy(false);
+            cashier.setNum(value);
+            cashier.setTimeAvailable(timeSpan);
+            cashiers.put(value, cashier);
+        }
+        return cashiers;
+    }
 
     public List<GeneratedTransaction> buildClientTransaction() {
         List<GeneratedTransaction> generatedTransactions = new ArrayList<>();
+        Map<CashierIndex, Cashier> cashiers = buildCashiers();
         for (int minute = 0; minute < 60; minute++) {
             GeneratedTransaction generatedTransaction = new GeneratedTransaction();
+            lastActiveCashier = null;
+            for (CashierIndex value : CashierIndex.values()) {
+                cashiers.get(value).setUsedTime(0);
+            }
             //definimos la informacion respecto a la cantidad de personas segun el metodo montecarlonumcliente
             int randomPasses = 1;
             MontecarloClientAmountGenerator clientNumberGenerator = new MontecarloClientAmountGenerator(randomPasses); //instancia el metodo desde la clase random_montecarlo
             int clientAmount = clientNumberGenerator.clientRoundUp();
             ClientAmount = ClientAmount + (clientAmount + 1);
             TotalClientsNotServed = ClientAmount - NotServed;
-            int dato = minute / 6;
-            int mod = minute % 6;
-            if (mod == 0) {
-                String Message = dayHourPrefix[dato] +
-                        mod * 10 + "0 - " +
-                        dayHourPrefix[dato] +
+            int hourIndex = minute / 6;
+            int minutesOffset = minute % 6;
+            if (minutesOffset == 0) {
+                String Message = dayHourPrefix[hourIndex] +
+                        minutesOffset * timeSpan + "0 - " +
+                        dayHourPrefix[hourIndex] +
                         "0" +
-                        ((mod * 10) + 9) +
+                        ((minutesOffset * timeSpan) + timeRange) +
                         "\n";
                 generatedTransaction.setTimeSpan(Message);
             } else {
-                String Message = dayHourPrefix[dato] +
-                        mod * 10 +
+                String Message = dayHourPrefix[hourIndex] +
+                        minutesOffset * timeSpan +
                         " - " +
-                        dayHourPrefix[dato] +
-                        ((mod * 10) + 9) +
+                        dayHourPrefix[hourIndex] +
+                        ((minutesOffset * timeSpan) + timeRange) +
                         "\n";
                 generatedTransaction.setTimeSpan(Message);
             }
             generatedTransaction.setClientAmount(clientId[clientAmount]);
             int clientsByTransaction = clientId[clientAmount];
             List<ClientTransaction> clientTransactions = new ArrayList<>();
-            String Cajero =CajeroNum("");
+
             for (int transactionClientIdx = 0; transactionClientIdx < clientsByTransaction; transactionClientIdx++) {
-                if (Cajero != ""){
-                    Cajero = CajeroNum(Cajero);
-                }
+                double requiredTime = transactionTimeSpan();
+                Cashier nextCashier = getNextCashier(cashiers, requiredTime);
                 ClientTransaction clientTransaction = new ClientTransaction();
+                if (nextCashier != null) {
+                    clientTransaction.setServedBy(nextCashier.getNum());
+                    clientTransaction.setTransactionType(transactionData());
+                } else {
+                    clientTransaction.setTransactionType(TransactionType.NO_ATENDIDA);
+                }
                 clientTransaction.setClientId(transactionClientIdx);
-                clientTransaction.setTransactionType(transactionData());
-                clientTransaction.setTransactionTimeSpan(transactionTimeSpan());
-                clientTransaction.setCajeroNum(Cajero);
+                clientTransaction.setTransactionTimeSpan(requiredTime);
                 clientTransactions.add(clientTransaction);
                 NotServed = TotalDeposits + TotalWithdrawal + TotalServicePayment + TotalAccountOpening;
             }
@@ -67,16 +117,6 @@ public class Proyecto_simulacion {
             generatedTransactions.add(generatedTransaction);
         }
         return generatedTransactions;
-    }
-
-    private String CajeroNum( String Cajero ){
-
-        switch (Cajero){
-            case  "Cajero 1":
-                return  "Cajero 2";
-            default:
-                return  "Cajero 1";
-        }
     }
 
     private TransactionType transactionData() {

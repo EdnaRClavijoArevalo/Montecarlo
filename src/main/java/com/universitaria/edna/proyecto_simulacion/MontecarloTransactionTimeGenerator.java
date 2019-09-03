@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class MontecarloTransactionTimeGenerator {
     private double generatedValue = 0;
-    private final double[] timeSpan = {1.5, 2.2, 4.5, 5.0};
+    private final double[] timeSpan = {1.5, 2.2, 4.1, 5.0};
 
     public MontecarloTransactionTimeGenerator(int valuesToGenerate) {
         Random random1 = new Random();

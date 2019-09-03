@@ -4,12 +4,8 @@ public class ClientTransaction {
     private int clientId;
     private TransactionType transactionType;
     private double transactionTimeSpan;
-    private String cajeroNum;
+    private CashierIndex servedBy;
 
-    public String getCajeroNum(){ return  cajeroNum;}
-    public void setCajeroNum(String cajeroNum) {
-        this.cajeroNum = cajeroNum;
-    }
     public int getClientId() {
         return clientId;
     }
@@ -34,10 +30,18 @@ public class ClientTransaction {
         this.transactionTimeSpan = transactionTimeSpan;
     }
 
+    public CashierIndex getServedBy() {
+        return servedBy;
+    }
+
+    public void setServedBy(CashierIndex servedBy) {
+        this.servedBy = servedBy;
+    }
+
     @Override
     public String toString() {
-        return String.format("%-10s, %-15s, %-15s", "Cliente #", "Transacción", "Duración Minutos") + "\n" +
-                String.format("%10s, %15s, %15s", clientId, transactionType.getValue(), transactionTimeSpan) + "\n";
+        return String.format("%-10s, %-15s, %-15s, %-15s", "Cliente #", "Transacción", "Duración Minutos", "Cajero") + "\n" +
+                String.format("%10s, %15s, %15s, %-15s", clientId, transactionType.getValue(), transactionTimeSpan, servedBy) + "\n";
 
     }
 }

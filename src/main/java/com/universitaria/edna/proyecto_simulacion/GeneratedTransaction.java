@@ -31,10 +31,11 @@ public class GeneratedTransaction {
         this.clientTransactions = clientTransactions;
     }
 
+
     @Override
     public String toString() {
         return "El lapso de tiempo a evaluar:       " + timeSpan + "\n" +
                 "la cantidad de personas son:       " + clientAmount + "\n" +
-                clientTransactions+ "\n";
+                clientTransactions + "\n";
     }
 }

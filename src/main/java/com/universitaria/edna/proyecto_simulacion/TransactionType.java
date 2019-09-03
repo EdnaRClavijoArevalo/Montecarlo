@@ -4,6 +4,7 @@ public enum TransactionType {
     CONSIGNACION("Consignacion"),
     RETIRO("Retiro"),
     PAGO_SERVICIOS("Pago Servicios"),
+    NO_ATENDIDA("No atendida"),
     APERTURA_CUENTA("Apertura de Cuenta");
 
     private final String value;
